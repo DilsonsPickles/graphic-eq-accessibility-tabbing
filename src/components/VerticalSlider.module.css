@@ -19,19 +19,13 @@
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  width: 4px;
-  background: #ddd;
-  border-radius: 2px;
+  width: 3px;
+  background: #888;
+  border-radius: 1px;
 }
 
 .fill {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: #0066cc;
-  border-radius: 2px;
-  transition: height 0.1s ease;
+  display: none;
 }
 
 .thumb {
@@ -39,31 +33,47 @@
   left: 50%;
   transform: translateX(-50%) translateY(-50%);
   width: 16px;
-  height: 16px;
-  background: #0066cc;
-  border: 2px solid #fff;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  height: 32px;
+  background: linear-gradient(180deg, #f0f0f0 0%, #d0d0d0 50%, #b0b0b0 100%);
+  border: 1px solid #666;
+  border-radius: 2px;
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
   transition: all 0.1s ease;
   pointer-events: none;
+  position: relative;
+}
+
+.thumb::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  right: 3px;
+  height: 1px;
+  background: #666;
+  transform: translateY(-50%);
 }
 
 .slider:hover .thumb,
 .slider:focus .thumb {
-  background: #0052a3;
-  transform: translateX(-50%) translateY(-50%) scale(1.1);
+  background: linear-gradient(180deg, #f8f8f8 0%, #d8d8d8 50%, #b8b8b8 100%);
+  transform: translateX(-50%) translateY(-50%) scale(1.05);
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .dragging .thumb {
-  background: #0052a3;
-  transform: translateX(-50%) translateY(-50%) scale(1.2);
+  background: linear-gradient(180deg, #e8e8e8 0%, #c8c8c8 50%, #a8a8a8 100%);
+  transform: translateX(-50%) translateY(-50%) scale(1.05);
   transition: none;
-}
-
-.dragging .fill {
-  transition: none;
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .slider:focus .track {
-  background: #bbb;
+  background: #666;
 }

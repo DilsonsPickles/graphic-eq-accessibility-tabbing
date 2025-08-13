@@ -20,7 +20,7 @@ export default function NestedTabGroup({ children, className, tabIndex = 0, aria
     
     const elements = Array.from(
       containerRef.current.querySelectorAll(
-        'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, input, select, textarea, [role="slider"], [tabindex]:not([tabindex="-1"])'
       )
     ) as HTMLElement[];
     
@@ -142,7 +142,7 @@ export default function NestedTabGroup({ children, className, tabIndex = 0, aria
   const enhancedChildren = children.map((child, index) => {
     return cloneElement(child, {
       ...(child.props || {}),
-      tabIndex: isNested ? (index === 0 ? 0 : -1) : -1,
+      tabIndex: isNested ? (index === 0 ? 0 : -1) : (index === 0 ? -1 : -1),
       key: index
     } as React.HTMLProps<HTMLElement>);
   });
