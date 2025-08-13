@@ -401,25 +401,48 @@
 
 .fader {
   -webkit-appearance: slider-vertical;
-  -webkit-writing-mode: bt-lr;
-  writing-mode: vertical-lr;
-  transform: rotate(180deg);
+  appearance: none;
+  writing-mode: bt-lr;
   width: 20px;
   height: 280px;
-  background: transparent;
+  background: #ddd;
   cursor: pointer;
   flex: 1;
   margin: 0 2px;
   outline: none;
+  border-radius: 10px;
 }
 
-/* Firefox vertical slider support */
-@-moz-document url-prefix() {
-  .fader {
-    transform: rotate(-90deg);
-    width: 280px;
-    height: 20px;
-  }
+/* Webkit browsers */
+.fader::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #0066cc;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.fader::-webkit-slider-track {
+  background: #ddd;
+  border-radius: 10px;
+  width: 100%;
+}
+
+/* Firefox */
+.fader::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #0066cc;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.fader::-moz-range-track {
+  background: #ddd;
+  border-radius: 10px;
 }
 
 .fader:focus {
