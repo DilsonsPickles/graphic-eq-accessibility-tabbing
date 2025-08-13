@@ -82,10 +82,12 @@ export default function VerticalSlider({
     
     switch (e.key) {
       case 'ArrowUp':
+      case 'ArrowRight':
         e.preventDefault();
         newValue = value + step;
         break;
       case 'ArrowDown':
+      case 'ArrowLeft':
         e.preventDefault();
         newValue = value - step;
         break;
