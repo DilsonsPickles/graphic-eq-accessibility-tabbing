@@ -226,14 +226,26 @@
 }
 
 .fader {
-  writing-mode: bt-lr;
   -webkit-appearance: slider-vertical;
+  -webkit-writing-mode: bt-lr;
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
   width: 20px;
   height: 280px;
   background: transparent;
   cursor: pointer;
   flex: 1;
   margin: 0 2px;
+  outline: none;
+}
+
+/* Firefox vertical slider support */
+@-moz-document url-prefix() {
+  .fader {
+    transform: rotate(-90deg);
+    width: 280px;
+    height: 20px;
+  }
 }
 
 .fader:focus {
