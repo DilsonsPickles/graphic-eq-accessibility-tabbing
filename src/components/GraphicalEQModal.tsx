@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './GraphicalEQModal.module.css';
 import TabGroup from './TabGroup';
 import NestedTabGroup from './NestedTabGroup';
+import VerticalSlider from './VerticalSlider';
 
 interface GraphicalEQModalProps {
   isOpen: boolean;
@@ -270,15 +271,13 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
               ariaLabel="EQ Fader controls - press Enter to navigate individual faders, Escape to exit"
             >
               {frequencies.map((freq, index) => (
-                <input
+                <VerticalSlider
                   key={index}
-                  type="range"
-                  min="-20"
-                  max="20"
                   value={faderValues[index]}
-                  onChange={(e) => handleFaderChange(index, parseInt(e.target.value))}
-                  className={styles.fader}
-                  aria-label={`${freq} Hz frequency band`}
+                  min={-20}
+                  max={20}
+                  onChange={(value) => handleFaderChange(index, value)}
+                  ariaLabel={`${freq} Hz frequency band`}
                 />
               ))}
             </NestedTabGroup>

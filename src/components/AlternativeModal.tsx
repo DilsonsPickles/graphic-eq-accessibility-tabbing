@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './AlternativeModal.module.css';
 import NestedTabGroup from './NestedTabGroup';
+import VerticalSlider from './VerticalSlider';
 
 interface AlternativeModalProps {
   isOpen: boolean;
@@ -237,15 +238,13 @@ export default function AlternativeModal({ isOpen, onClose }: AlternativeModalPr
               ariaLabel="EQ Fader controls - press Enter to navigate individual faders, Escape to exit"
             >
               {frequencies.map((freq, index) => (
-                <input
+                <VerticalSlider
                   key={index}
-                  type="range"
-                  min="-20"
-                  max="20"
                   value={faderValues[index]}
-                  onChange={(e) => handleFaderChange(index, parseInt(e.target.value))}
-                  className={styles.fader}
-                  aria-label={`${freq} Hz frequency band`}
+                  min={-20}
+                  max={20}
+                  onChange={(value) => handleFaderChange(index, value)}
+                  ariaLabel={`${freq} Hz frequency band`}
                 />
               ))}
             </NestedTabGroup>
