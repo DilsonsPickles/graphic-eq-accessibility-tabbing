@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './GraphicalEQModal.module.css';
 import TabGroup from './TabGroup';
-import NestedTabGroup from './NestedTabGroup';
 import VerticalSlider from './VerticalSlider';
 
 interface GraphicalEQModalProps {
@@ -41,23 +40,16 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        // Check if we're in a nested tab group
-        const activeElement = document.activeElement;
-        const nestedActiveElement = document.querySelector('.nested-active');
-        
-        // Only close modal if we're not inside a nested group
-        if (!nestedActiveElement || !nestedActiveElement.contains(activeElement)) {
-          onClose();
-        }
+        onClose();
       } else if (event.key === 'F6') {
         event.preventDefault();
         const activeElement = document.activeElement;
         
         if (event.shiftKey) {
-          // Shift+F6 navigation (backwards): Preview → Invert → Slider container → Preset dropdown → (loop back)
-          if (activeElement?.getAttribute('tabindex') === '4') {
+          // Shift+F6 navigation (backwards): Preview → Invert → First fader → Preset dropdown → (loop back)
+          if (activeElement?.getAttribute('tabindex') === '35') {
             // From Preview to Invert button
-            const eqControlsGroup = document.querySelector('[tabindex="3"]') as HTMLElement;
+            const eqControlsGroup = document.querySelector('[tabindex="34"]') as HTMLElement;
             if (eqControlsGroup) {
               const invertButton = Array.from(eqControlsGroup.querySelectorAll('button')).find(btn => 
                 btn.textContent?.includes('Invert')
@@ -72,31 +64,35 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
               }
             }
           } else if (activeElement?.textContent?.includes('Invert') || 
-                     (activeElement?.getAttribute('tabindex') === '3')) {
-            // From Invert or EQ controls group to slider container
-            const sliderContainer = document.querySelector('[tabindex="2"]') as HTMLElement;
-            sliderContainer?.focus();
-          } else if (activeElement?.getAttribute('tabindex') === '2') {
-            // From slider container to preset dropdown
+                     (activeElement?.getAttribute('tabindex') === '34')) {
+            // From Invert or EQ controls group to first fader
+            const firstFader = document.querySelector('[tabindex="33"]') as HTMLElement;
+            firstFader?.focus();
+          } else if (activeElement?.getAttribute('tabindex') && 
+                     parseInt(activeElement.getAttribute('tabindex') || '0') >= 2 && 
+                     parseInt(activeElement.getAttribute('tabindex') || '0') <= 33) {
+            // From any fader to preset dropdown
             presetDropdownRef.current?.focus();
           } else if (activeElement === presetDropdownRef.current) {
             // From preset dropdown to Preview (wrapping backwards)
-            const previewButton = document.querySelector('[tabindex="4"]') as HTMLElement;
+            const previewButton = document.querySelector('[tabindex="35"]') as HTMLElement;
             previewButton?.focus();
           } else {
             // Default: go to Preview
-            const previewButton = document.querySelector('[tabindex="4"]') as HTMLElement;
+            const previewButton = document.querySelector('[tabindex="35"]') as HTMLElement;
             previewButton?.focus();
           }
         } else {
-          // F6 navigation (forwards): Preset dropdown → Slider container → Invert → Preview → (loop back)
+          // F6 navigation (forwards): Preset dropdown → First fader → Invert → Preview → (loop back)
           if (activeElement === presetDropdownRef.current) {
-            // From preset dropdown to slider container
-            const sliderContainer = document.querySelector('[tabindex="2"]') as HTMLElement;
-            sliderContainer?.focus();
-          } else if (activeElement?.getAttribute('tabindex') === '2') {
-            // From slider container to Invert button (tabindex 3 is the EQ controls group, find Invert within it)
-            const eqControlsGroup = document.querySelector('[tabindex="3"]') as HTMLElement;
+            // From preset dropdown to first fader
+            const firstFader = document.querySelector('[tabindex="2"]') as HTMLElement;
+            firstFader?.focus();
+          } else if (activeElement?.getAttribute('tabindex') && 
+                     parseInt(activeElement.getAttribute('tabindex') || '0') >= 2 && 
+                     parseInt(activeElement.getAttribute('tabindex') || '0') <= 33) {
+            // From any fader to Invert button
+            const eqControlsGroup = document.querySelector('[tabindex="34"]') as HTMLElement;
             if (eqControlsGroup) {
               const invertButton = Array.from(eqControlsGroup.querySelectorAll('button')).find(btn => 
                 btn.textContent?.includes('Invert')
@@ -112,11 +108,11 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
               }
             }
           } else if (activeElement?.textContent?.includes('Invert') || 
-                     (activeElement?.getAttribute('tabindex') === '3')) {
+                     (activeElement?.getAttribute('tabindex') === '34')) {
             // From Invert or EQ controls group to Preview
-            const previewButton = document.querySelector('[tabindex="4"]') as HTMLElement;
+            const previewButton = document.querySelector('[tabindex="35"]') as HTMLElement;
             previewButton?.focus();
-          } else if (activeElement?.getAttribute('tabindex') === '4') {
+          } else if (activeElement?.getAttribute('tabindex') === '35') {
             // From Preview back to preset dropdown
             presetDropdownRef.current?.focus();
           } else {
@@ -127,16 +123,16 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
       } else if (event.key === 'Tab') {
         const activeElement = document.activeElement;
         
-        // If we're on the Apply button and tabbing forward, wrap to preset dropdown
-        if (activeElement?.getAttribute('tabindex') === '6' && !event.shiftKey) {
+        // If we're on the footer button group and tabbing forward, wrap to preset dropdown
+        if (activeElement?.getAttribute('tabindex') === '35' && !event.shiftKey) {
           event.preventDefault();
           presetDropdownRef.current?.focus();
         }
-        // If we're on the preset dropdown and shift-tabbing backward, wrap to Apply button
+        // If we're on the preset dropdown and shift-tabbing backward, wrap to footer button group
         else if (activeElement === presetDropdownRef.current && event.shiftKey) {
           event.preventDefault();
-          const applyButton = document.querySelector('[tabindex="6"]') as HTMLElement;
-          applyButton?.focus();
+          const footerButtonGroup = document.querySelector('[tabindex="35"]') as HTMLElement;
+          footerButtonGroup?.focus();
         }
       }
     };
@@ -265,11 +261,7 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
             </div>
 
             {/* Faders */}
-            <NestedTabGroup 
-              className={styles.fadersContainer} 
-              tabIndex={2}
-              ariaLabel="EQ Fader controls - press Enter to navigate individual faders, Escape to exit"
-            >
+            <div className={styles.fadersContainer}>
               {frequencies.map((freq, index) => (
                 <VerticalSlider
                   key={index}
@@ -278,13 +270,14 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
                   max={20}
                   onChange={(value) => handleFaderChange(index, value)}
                   ariaLabel={`${freq} Hz frequency band`}
+                  tabIndex={2 + index}
                 />
               ))}
-            </NestedTabGroup>
+            </div>
           </div>
 
           {/* EQ Controls */}
-          <TabGroup className={styles.eqControls} tabIndex={3}>
+          <TabGroup className={styles.eqControls} tabIndex={34}>
             <button 
               className={styles.eqButton}
               onClick={handleFlatten}
@@ -301,19 +294,19 @@ export default function GraphicalEQModal({ isOpen, onClose }: GraphicalEQModalPr
         </div>
 
         {/* Modal Footer */}
-        <div className={styles.modalFooter}>
-          <button className={styles.previewButton} tabIndex={4}>
+        <TabGroup className={styles.modalFooter} tabIndex={35}>
+          <button className={styles.previewButton}>
             Preview
           </button>
           <div className={styles.buttonGroup}>
-            <button className={styles.cancelButton} tabIndex={5} onClick={onClose}>
+            <button className={styles.cancelButton} onClick={onClose}>
               Cancel
             </button>
-            <button className={styles.applyButton} tabIndex={6}>
+            <button className={styles.applyButton}>
               Apply
             </button>
           </div>
-        </div>
+        </TabGroup>
       </div>
     </div>
   );

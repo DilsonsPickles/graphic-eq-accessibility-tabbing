@@ -21,8 +21,10 @@ export default function VerticalSlider({
   tabIndex = 0 
 }: VerticalSliderProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
+  const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const normalizeValue = (val: number) => Math.max(min, Math.min(max, val));
   
@@ -80,31 +82,42 @@ export default function VerticalSlider({
     let newValue = value;
     const step = 1;
     
+    // Clear existing timeout
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+    
     switch (e.key) {
       case 'ArrowUp':
       case 'ArrowRight':
         e.preventDefault();
+        setShowTooltip(true);
         newValue = value + step;
         break;
       case 'ArrowDown':
       case 'ArrowLeft':
         e.preventDefault();
+        setShowTooltip(true);
         newValue = value - step;
         break;
       case 'PageUp':
         e.preventDefault();
+        setShowTooltip(true);
         newValue = value + step * 5;
         break;
       case 'PageDown':
         e.preventDefault();
+        setShowTooltip(true);
         newValue = value - step * 5;
         break;
       case 'Home':
         e.preventDefault();
+        setShowTooltip(true);
         newValue = max;
         break;
       case 'End':
         e.preventDefault();
+        setShowTooltip(true);
         newValue = min;
         break;
       default:
@@ -112,7 +125,23 @@ export default function VerticalSlider({
     }
     
     onChange(normalizeValue(newValue));
+    
+    // Hide tooltip after 1.5 seconds of inactivity
+    tooltipTimeoutRef.current = setTimeout(() => {
+      setShowTooltip(false);
+    }, 1500);
   }, [value, min, max, onChange]);
+
+  const handleFocus = useCallback(() => {
+    // Don't show tooltip on focus, only on keyboard interaction
+  }, []);
+
+  const handleBlur = useCallback(() => {
+    if (tooltipTimeoutRef.current) {
+      clearTimeout(tooltipTimeoutRef.current);
+    }
+    setShowTooltip(false);
+  }, []);
 
   const thumbPosition = `${100 - getPercentage()}%`;
 
@@ -122,6 +151,8 @@ export default function VerticalSlider({
       className={`${styles.slider} ${isDragging ? styles.dragging : ''}`}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       role="slider"
       aria-label={ariaLabel}
       aria-valuemin={min}
@@ -141,6 +172,18 @@ export default function VerticalSlider({
         className={styles.thumb}
         style={{ top: thumbPosition }}
       />
+      {showTooltip && (
+        <div 
+          className={styles.tooltip}
+          style={{ 
+            top: `calc(${thumbPosition} - 40px)`,
+            left: '50%',
+            transform: 'translateX(-50%)'
+          }}
+        >
+          {value > 0 ? `+${value}` : value} dB
+        </div>
+      )}
     </div>
   );
 }
